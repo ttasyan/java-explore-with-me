@@ -7,10 +7,10 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>stats-service</artifactId>
+    <artifactId>stats-server</artifactId>
     <packaging>pom</packaging>
 
-    <name>stats</name>
+    <name>stats-server</name>
     <url>http://maven.apache.org</url>
     <modules>
         <module>dto</module>

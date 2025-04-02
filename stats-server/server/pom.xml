@@ -3,11 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>ru.practicum</groupId>
-        <artifactId>stats-service</artifactId>
+        <artifactId>stats-server</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     <artifactId>server</artifactId>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <name>server Maven Webapp</name>
     <url>http://maven.apache.org</url>
     <dependencies>
@@ -16,11 +16,12 @@
             <artifactId>dto</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
-        <dependency>
-            <groupId>ru.practicum</groupId>
-            <artifactId>stats-client</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
+            <dependency>
+                <groupId>ru.practicum</groupId>
+                <artifactId>stats-client</artifactId>
+                <version>0.0.1-SNAPSHOT</version>
+            </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
