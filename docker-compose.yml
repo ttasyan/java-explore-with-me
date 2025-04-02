@@ -2,6 +2,9 @@ services:
   stats:
     ports:
       - "9090:9090"
+    build:
+      context: ./stats
+      dockerfile: Dockerfile
 
   stats-db:
     image: postgres:16.1
@@ -9,6 +12,9 @@ services:
   main-service:
     ports:
       - "8080:8080"
+    build:
+      context: ./main-service
+      dockerfile: Dockerfile
 
   ewm-db:
     image: postgres:16.1
