@@ -3,7 +3,7 @@ services:
     ports:
       - "9090:9090"
     build:
-      context: ./stats
+      context: ./stats-server
       dockerfile: Dockerfile
 
   stats-db:
@@ -13,7 +13,7 @@ services:
     ports:
       - "8080:8080"
     build:
-      context: ./main-service
+      context: ./ewm-service
       dockerfile: Dockerfile
 
   ewm-db:
