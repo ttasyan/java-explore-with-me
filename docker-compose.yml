@@ -3,7 +3,7 @@ services:
     ports:
       - "9090:9090"
     build:
-      context: ./stats-server
+      context: ./stats-server/server
       dockerfile: Dockerfile
 
   stats-db:
