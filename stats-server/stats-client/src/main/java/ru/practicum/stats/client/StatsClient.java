@@ -1,48 +1,58 @@
 package ru.practicum.stats.client;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.stats.dto.HitRequest;
 import ru.practicum.stats.dto.StatsResponse;
 
-import java.time.LocalDateTime;
 import java.util.List;
-
-@Service
+@Component
 public class StatsClient {
-    private final RestTemplate rest;
-    private final HttpHeaders headers;
-    private final HitRepository hitRepository;
+    private final RestClient restClient = RestClient.create();
+    private static final String STATS_SERVER_URI = "http://localhost:9090";
 
-    @Autowired
-    public StatsClient(RestTemplate rest, HitRepository repository) {
-        this.hitRepository = repository;
-        this.rest = rest;
-        this.headers = new HttpHeaders();
-        this.headers.setContentType(MediaType.APPLICATION_JSON);
-        this.headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+
+    public ResponseEntity<List<StatsResponse>> stats(String start, String end, List<String> uris, boolean unique) {
+
+        String currentUri = UriComponentsBuilder.fromHttpUrl(STATS_SERVER_URI)
+                .path("/stats")
+                .queryParam("start", start)
+                .queryParam("end", end)
+                .queryParam("uris", uris)
+                .queryParam("unique", unique)
+                .toUriString();
+
+        return restClient.get()
+                .uri(currentUri)
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
+                    throw new StatsClientException(response.getBody().toString());
+                }))
+                .onStatus(HttpStatusCode::is5xxServerError, ((request, response) -> {
+                    throw new StatsClientException(response.getBody().toString());
+                }))
+                .body(new ParameterizedTypeReference<>() {
+                });
     }
 
-    public ResponseEntity<List<StatsResponse>> stats(String path, String start, String end, List<String> uris, boolean unique) {
 
-        LocalDateTime startDateTime = LocalDateTime.parse(start);
-        LocalDateTime endDateTime = LocalDateTime.parse(end);
-        List<StatsResponse> stats;
-        if (unique) {
-            stats = hitRepository.countUniqueHits(startDateTime, endDateTime, uris);
-        } else {
-            stats = hitRepository.countHits(startDateTime, endDateTime, uris);
-        }
-        HttpEntity<List<StatsResponse>> requestEntity = new HttpEntity<>(stats, headers);
-        return rest.exchange(path, HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<StatsResponse>>() {
-        });
-    }
+    public void hit(HitRequest hitRequest) {
+        String currentUri = UriComponentsBuilder.fromHttpUrl(STATS_SERVER_URI).path("/hit").toUriString();
 
-    public void hit(String path, HitRequest request) {
-        HttpEntity<HitRequest> requestEntity = new HttpEntity<>(request, headers);
-        rest.exchange(path, HttpMethod.POST, requestEntity, HitRequest.class);
+        restClient.post()
+                .uri(currentUri)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(hitRequest)
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
+                    throw new StatsClientException(response.getBody().toString());
+                }))
+                .onStatus(HttpStatusCode::is5xxServerError, ((request, response) -> {
+                    throw new StatsClientException(response.getBody().toString());
+                }))
+                .toBodilessEntity();
     }
 }
