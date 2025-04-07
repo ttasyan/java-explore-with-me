@@ -1,7 +1,7 @@
 FROM openjdk:21-jdk-slim
 
-COPY target/*.jar ewm-service.jar
+COPY target/ewm-service-0.0.1-SNAPSHOT.jar ewm-service.jar
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "ewm-service.war"]
+ENTRYPOINT ["java", "-jar", "ewm-service.jar"]
