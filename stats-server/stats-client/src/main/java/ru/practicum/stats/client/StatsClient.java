@@ -9,6 +9,7 @@ import ru.practicum.stats.dto.HitRequest;
 import ru.practicum.stats.dto.StatsResponse;
 
 import java.util.List;
+
 @Component
 public class StatsClient {
     private final RestClient restClient = RestClient.create();
