@@ -1,4 +1,4 @@
-FROM openjdk:21-jdk-slim
+FROM amazoncorretto:21
 
 COPY target/ewm-service-0.0.1-SNAPSHOT.jar ewm-service.jar
 
