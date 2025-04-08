@@ -5,9 +5,17 @@ services:
     build:
       context: ./stats-server/server
       dockerfile: Dockerfile
+    container_name: stats-server
 
   stats-db:
     image: postgres:16.1
+    container_name: stats-db
+    ports:
+      - "5432:5432"
+    environment:
+        - POSTGRES_DB=stats_postgres_db
+        - POSTGRES_USER=sa
+        - POSTGRES_PASSWORD=pass
 
   ewm-service:
     ports:
@@ -18,3 +26,10 @@ services:
 
   ewm-db:
     image: postgres:16.1
+    container_name: ewm-db
+    ports:
+      - "5461:5432"
+    environment:
+      - POSTGRES_DB=ewm_postgres_db
+      - POSTGRES_USER=sa
+      - POSTGRES_PASSWORD=pass
