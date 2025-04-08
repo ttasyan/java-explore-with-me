@@ -1,6 +1,6 @@
 FROM amazoncorretto:21
 
-COPY target/*.jar ewm-service.jar
+COPY target/*.war ewm-service.war
 
 EXPOSE 8080
 
