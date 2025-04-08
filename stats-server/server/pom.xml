@@ -8,8 +8,7 @@
     </parent>
     <artifactId>server</artifactId>
     <packaging>jar</packaging>
-    <name>server Maven Webapp</name>
-    <url>http://maven.apache.org</url>
+
     <dependencies>
         <dependency>
             <groupId>ru.practicum</groupId>
@@ -28,22 +27,14 @@
             <version>3.8.1</version>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
     <build>
         <finalName>server</finalName>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.0</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <mainClass>ru.practicum.StatsServerApplication</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

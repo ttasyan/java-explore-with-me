@@ -1,11 +1,19 @@
 services:
   stats-server:
+    image: stats-server-image
     ports:
       - "9090:9090"
     build:
       context: ./stats-server/server
       dockerfile: Dockerfile
     container_name: stats-server
+    networks:
+      - stat-net
+
+    environment:
+        - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/postgres
+        - SPRING_DATASOURCE_USERNAME=sa
+        - SPRING_DATASOURCE_PASSWORD=pass
 
   stats-db:
     image: postgres:16.1
@@ -18,11 +26,20 @@ services:
         - POSTGRES_PASSWORD=pass
 
   ewm-service:
+    image: ewm-service-image
     ports:
       - "8080:8080"
     build:
       context: ./ewm-service
       dockerfile: Dockerfile
+    depends_on:
+        - ewm-db
+    environment:
+          - CLIENT_URL=http://stats-server:9090
+          - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/postgres
+          - SPRING_DATASOURCE_USERNAME=sa
+          - SPRING_DATASOURCE_PASSWORD=pass
+
 
   ewm-db:
     image: postgres:16.1
@@ -33,3 +50,8 @@ services:
       - POSTGRES_DB=ewm_postgres_db
       - POSTGRES_USER=sa
       - POSTGRES_PASSWORD=pass
+
+volumes:
+    postgres:
+networks:
+    stat-net:
