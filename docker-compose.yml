@@ -21,7 +21,7 @@ services:
     ports:
       - "5432:5432"
     environment:
-        - POSTGRES_DB=stats_postgres_db
+        - POSTGRES_DB=stats-db
         - POSTGRES_USER=sa
         - POSTGRES_PASSWORD=pass
 
