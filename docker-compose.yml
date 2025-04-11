@@ -1,21 +1,21 @@
 services:
-  stats-server:
-    image: stats-server-image
-    ports:
-      - "9090:9090"
-    build:
-      context: ./stats-server/server
-      dockerfile: Dockerfile
-    container_name: stats-server
-    networks:
-      - stat-net
-    depends_on:
-      stats-db:
-        condition: service_healthy
-    environment:
-        - SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/stats-db
-        - SPRING_DATASOURCE_USERNAME=sa
-        - SPRING_DATASOURCE_PASSWORD=pass
+#  stats-server:
+#    image: stats-server-image
+#    ports:
+#      - "9090:9090"
+#    build:
+#      context: ./stats-server/server
+#      dockerfile: Dockerfile
+#    container_name: stats-server
+#    networks:
+#      - stat-net
+#    depends_on:
+#      stats-db:
+#        condition: service_healthy
+#    environment:
+#        - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/stats-db
+#        - SPRING_DATASOURCE_USERNAME=sa
+#        - SPRING_DATASOURCE_PASSWORD=pass
 
   stats-db:
     image: postgres:16.1
