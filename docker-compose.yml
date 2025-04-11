@@ -3,9 +3,7 @@ services:
     image: stats-server-image
     ports:
       - "9090:9090"
-    build:
-      context: ./stats-server/server
-      dockerfile: Dockerfile
+    build: ./stats-server/server
     container_name: stats-server
     networks:
       - stat-net
@@ -33,6 +31,8 @@ services:
       retries: 10
     volumes:
       - postgres:/var/lib/postgresql/data
+    networks:
+      - stat-net
 
   ewm-service:
     image: ewm-service-image
