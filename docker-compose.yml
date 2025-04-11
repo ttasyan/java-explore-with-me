@@ -9,7 +9,9 @@ services:
     container_name: stats-server
     networks:
       - stat-net
-
+    depends_on:
+      stats-db:
+        condition: service_healthy
     environment:
         - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/stats-db
         - SPRING_DATASOURCE_USERNAME=sa
@@ -24,6 +26,7 @@ services:
         - POSTGRES_DB=stats-db
         - POSTGRES_USER=sa
         - POSTGRES_PASSWORD=pass
+
 
   ewm-service:
     image: ewm-service-image
