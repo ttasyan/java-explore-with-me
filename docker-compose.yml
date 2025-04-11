@@ -26,7 +26,11 @@ services:
         - POSTGRES_DB=stats-db
         - POSTGRES_USER=sa
         - POSTGRES_PASSWORD=pass
-
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
 
   ewm-service:
     image: ewm-service-image
