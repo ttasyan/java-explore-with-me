@@ -56,7 +56,7 @@ services:
     ports:
       - "6543:5432"
     environment:
-      - POSTGRES_DB=ewm_postgres_db
+      - POSTGRES_DB=ewm-db
       - POSTGRES_USER=sa
       - POSTGRES_PASSWORD=pass
 
