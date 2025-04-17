@@ -9,11 +9,13 @@ import java.util.List;
 @RequestMapping(path = "/categories")
 @RequiredArgsConstructor
 public class PublicCategoryController {
-    private CategoryService service;
+    private final CategoryService service;
+
     @GetMapping
     public List<CategoryDto> getAll(@RequestParam int from, @PathVariable int size) {
         return service.getAll(from, size);
     }
+
     @GetMapping("/{catId}")
     public CategoryDto getById(@PathVariable long catId) {
         return service.getById(catId);

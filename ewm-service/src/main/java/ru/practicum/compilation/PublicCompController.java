@@ -9,12 +9,14 @@ import java.util.List;
 @RequestMapping(path = "/compilations")
 @RequiredArgsConstructor
 public class PublicCompController {
-    private CompService service;
+    private final CompService service;
+
     @GetMapping
     public List<CompilationDto> getAllPublic(@RequestParam boolean pinned, @RequestParam(defaultValue = "0") int from,
                                              @RequestParam(defaultValue = "10") int size) {
         return service.getAllPublic(pinned, from, size);
     }
+
     @GetMapping("/{compId}")
     public CompilationDto getByIdPublic(@PathVariable long compId) {
         return service.getByIdPublic(compId);

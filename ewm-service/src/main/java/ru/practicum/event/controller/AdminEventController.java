@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/admin/events")
 public class AdminEventController {
-    private EventService service;
+    private final EventService service;
 
     @GetMapping
     public List<EventFullDto> getAll(@RequestParam List<Long> users, @RequestParam List<String> states,

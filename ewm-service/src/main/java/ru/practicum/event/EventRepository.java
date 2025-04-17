@@ -15,7 +15,7 @@ import java.util.List;
 public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> findByCategoryId(long catId);
 
-    @Query("SELECT * FROM Event e WHERE e.eventDate BETWEEN :rangeStart AND :rangeEnd " +
+    @Query("SELECT e FROM Event e WHERE e.eventDate BETWEEN :rangeStart AND :rangeEnd " +
             "AND (:users IS NULL OR e.initiator IN :users) AND (:states IS NULL OR e.state IN :states)" +
             "AND (:categories IS NULL OR e.category IN :categories)")
     Page<Event> findWithParams(@Param("users") List<Long> users, @Param("states") List<String> states,
@@ -23,4 +23,11 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                                @Param("rangeEnd") LocalDateTime rangeEnd, Pageable pageable);
 
     Event findByIdAndInitiatorId(long eventId, long userId);
+    @Query("SELECT e FROM Event e WHERE e.eventDate BETWEEN :rangeStart AND :rangeEnd " +
+            "AND (:users IS NULL OR e.initiator IN :users) AND (:states IS NULL OR e.state IN :states)" +
+            "AND (:categories IS NULL OR e.category IN :categories)")
+    Page<Event> findWithParamsPublic(@Param("text") String text, @Param("categories")List<Long> categories,
+                                     @Param("paid")boolean paid, @Param("rangeStart")LocalDateTime rangeStart,
+                                     @Param("rangeEnd")LocalDateTime rangeEnd, @Param("onlyAvailable")boolean onlyAvailable,
+                                     Pageable pageable);
 }

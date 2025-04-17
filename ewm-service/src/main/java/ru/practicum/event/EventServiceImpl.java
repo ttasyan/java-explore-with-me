@@ -2,7 +2,6 @@ package ru.practicum.event;
 
 import jakarta.validation.ConstraintViolationException;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -88,7 +87,7 @@ public class EventServiceImpl implements EventService {
             if (LocalDateTime.now().plusHours(2).isAfter(newEvent.getEventDate())) {
                 throw new PublicationException("Date can not be less than 2 hours before now");
             }
-            Event event =  Event.builder()
+            Event event = Event.builder()
                     .title(newEvent.getTitle())
                     .eventDate(newEvent.getEventDate())
                     .description(newEvent.getDescription())
@@ -154,16 +153,16 @@ public class EventServiceImpl implements EventService {
         try {
 
             Event event = findById(eventId);
-            if(event.getParticipationLimit() == event.getConfirmedRequests()) {
+            if (event.getParticipationLimit() == event.getConfirmedRequests()) {
                 throw new RequestLimitException("Participation limit has been reached");
             }
             List<Request> requests = newRequest.getRequestIds().stream().map(requestId -> requestRepository.findById(requestId)
                     .orElseThrow(() -> new NotFoundException("Request not found"))).toList();
 
-            List<Request> confirmed=new ArrayList<>();
+            List<Request> confirmed = new ArrayList<>();
             List<Request> rejected = new ArrayList<>();
-            if (!event.isRequestModeration() || event.getParticipationLimit()==0) {
-                return new EventRequestStatusUpdateResult( requests.stream()
+            if (!event.isRequestModeration() || event.getParticipationLimit() == 0) {
+                return new EventRequestStatusUpdateResult(requests.stream()
                         .peek(request -> request.setStatus(RequestStatusType.CONFIRMED))
                         .map(requestMapper::requestToRequestDto).toList(), List.of());
             }
@@ -188,10 +187,10 @@ public class EventServiceImpl implements EventService {
     }
 
     public List<EventShortDto> getAllPublic(String text, List<Long> categories, boolean paid, LocalDateTime rangeStart,
-                                           LocalDateTime rangeEnd, boolean onlyAvailable, String sort, int from, int size) {
+                                            LocalDateTime rangeEnd, boolean onlyAvailable, String sort, int from, int size) {
         int page = from / size;
         Pageable pageable = PageRequest.of(page, size);
-        Page<Event> events = repository.findWithParams(null, null, categories, rangeStart, rangeEnd, pageable);
+        Page<Event> events = repository.findWithParamsPublic(text, categories, paid, rangeStart, rangeEnd, onlyAvailable,pageable);
         return events.stream().map(event -> mapper.eventToEventShortDto(event)).toList();
     }
 
@@ -221,6 +220,6 @@ public class EventServiceImpl implements EventService {
 
     private User findByIdUser(long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(()->new NotFoundException("User with id=" + userId + " not found"));
+                .orElseThrow(() -> new NotFoundException("User with id=" + userId + " not found"));
     }
 }

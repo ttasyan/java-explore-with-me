@@ -10,7 +10,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/users")
 public class PrivateRequestController {
-    private RequestService service;
+    private final RequestService service;
 
     @GetMapping("/{userId}/requests")
     public List<RequestDto> getById(@PathVariable long userId) {

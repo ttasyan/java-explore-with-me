@@ -1,9 +1,7 @@
 package ru.practicum.category;
 
 import jakarta.validation.ConstraintViolationException;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,7 +18,8 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryMapper mapper;
     private final CategoryRepository repository;
     private EventRepository eventRepository;
-    public CategoryDto addCategory(NewCategoryRequest request){
+
+    public CategoryDto addCategory(NewCategoryRequest request) {
         try {
             Category category = new Category();
             category.setName(request.getName());
@@ -30,7 +29,7 @@ public class CategoryServiceImpl implements CategoryService {
         }
     }
 
-    public void deleteCategory(long catId){
+    public void deleteCategory(long catId) {
         findCategoryById(catId);
 //        if (!eventRepository.findByCategoryId(catId).isEmpty()) {
 //            throw new
@@ -38,7 +37,7 @@ public class CategoryServiceImpl implements CategoryService {
         repository.deleteById(catId);
     }
 
-    public CategoryDto modifyCategory(long catId, NewCategoryRequest request){
+    public CategoryDto modifyCategory(long catId, NewCategoryRequest request) {
         try {
             Category category = findCategoryById(catId);
 
@@ -50,25 +49,26 @@ public class CategoryServiceImpl implements CategoryService {
 
     }
 
-    public CategoryDto getById(long catId){
+    public CategoryDto getById(long catId) {
         return mapper.categoryToCategoryDto(findCategoryById(catId));
     }
 
     public List<CategoryDto> getAll(int from, int size) {
-        int page = from/size;
+        int page = from / size;
         Pageable pageable = PageRequest.of(page, size);
         Page<Category> categories = repository.findAll(pageable);
-        return categories.stream().map(category -> mapper.categoryToCategoryDto(category)).toList();
+        return categories.stream().map(mapper::categoryToCategoryDto).toList();
 
     }
 
     private Category findCategoryById(long catId) {
-        return repository.findById(catId).orElseThrow(()-> new NotFoundException("Category with id="+ catId + " nto found"));
+        return repository.findById(catId).orElseThrow(() -> new NotFoundException("Category with id=" + catId + " nto found"));
     }
 
-    private RuntimeException isUnique(RuntimeException e, String categoryName){
+    private RuntimeException isUnique(RuntimeException e, String categoryName) {
         if (e.getMessage().contains("categories_name_key")) {
-            return new AlreadyExistsException("Category with name " + categoryName+ " already exists");
-        } return e;
+            return new AlreadyExistsException("Category with name " + categoryName + " already exists");
+        }
+        return e;
     }
 }

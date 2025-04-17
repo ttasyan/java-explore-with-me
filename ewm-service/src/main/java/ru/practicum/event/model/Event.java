@@ -67,5 +67,6 @@ public class Event {
 
     private int participationLimit;
 
+    private long views;
 
 }

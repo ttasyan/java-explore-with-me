@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(path = "/admin/compilations")
 @RequiredArgsConstructor
 public class AdminCompController {
-    private CompService service;
+    private final CompService service;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

@@ -2,7 +2,6 @@ package ru.practicum.user;
 
 import jakarta.validation.ConstraintViolationException;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,19 +15,21 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
     private UserRepository repository;
     private UserMapper mapper;
-    public List<UserDto> getAll(List<Long> ids, int from, int size){
-         int page = from/size;
-            Pageable pageable = PageRequest.of(page, size);
+
+    public List<UserDto> getAll(List<Long> ids, int from, int size) {
+        int page = from / size;
+        Pageable pageable = PageRequest.of(page, size);
         Page<User> users;
-        if(ids != null && !ids.isEmpty()) {
+        if (ids != null && !ids.isEmpty()) {
             users = repository.findUsersByIdIn(ids, pageable);
         } else {
-            users =repository.findAll(pageable);
-        } return users.stream().map(user -> mapper.userToUserDto(user)).toList();
+            users = repository.findAll(pageable);
+        }
+        return users.stream().map(user -> mapper.userToUserDto(user)).toList();
 
     }
 
-    public UserDto addUser(NewUserRequest request){
+    public UserDto addUser(NewUserRequest request) {
         try {
             return mapper.userToUserDto(repository.save(mapper.requestToUser(request)));
         } catch (ConstraintViolationException e) {
@@ -36,7 +37,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public void delete(long userId){
+    public void delete(long userId) {
         if (repository.findById(userId).isEmpty()) {
             throw new NotFoundException("User with id=" + userId + " not found");
         }

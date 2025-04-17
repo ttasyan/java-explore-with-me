@@ -14,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/events")
 public class PublicEventController {
-    private EventService service;
+    private final EventService service;
 
     @GetMapping
     public List<EventShortDto> getAllPublic(@RequestParam String text, @RequestParam List<Long> categories, @RequestParam boolean paid,

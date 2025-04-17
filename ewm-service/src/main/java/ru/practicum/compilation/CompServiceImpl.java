@@ -2,7 +2,6 @@ package ru.practicum.compilation;
 
 import jakarta.validation.ConstraintViolationException;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,13 +19,14 @@ public class CompServiceImpl implements CompService {
     private EventRepository eventRepository;
     private CompRepository repository;
     private CompMapper mapper;
-    public CompilationDto addComp(NewCompilation newCompilation){
+
+    public CompilationDto addComp(NewCompilation newCompilation) {
         try {
             Compilation compilation = new Compilation();
             compilation.setPinned(newCompilation.getPinned());
             compilation.setTitle(newCompilation.getTitle());
             compilation.setEvents(newCompilation.getEvents().stream().map(event -> eventRepository.findById(event)
-                    .orElseThrow(()-> new NotFoundException("Event with id="+event+ " not found")))
+                            .orElseThrow(() -> new NotFoundException("Event with id=" + event + " not found")))
                     .collect(Collectors.toSet()));
             return mapper.complicationToComplicationDto(repository.save(compilation));
         } catch (ConstraintViolationException e) {
@@ -34,12 +34,12 @@ public class CompServiceImpl implements CompService {
         }
     }
 
-    public void deleteComp(long compId){
+    public void deleteComp(long compId) {
         findById(compId);
         repository.deleteById(compId);
     }
 
-    public CompilationDto modifyComp(long compId, NewCompilation newCompilation){
+    public CompilationDto modifyComp(long compId, NewCompilation newCompilation) {
         try {
             Compilation compilation = findById(compId);
             if (!newCompilation.getEvents().isEmpty()) {
@@ -47,7 +47,7 @@ public class CompServiceImpl implements CompService {
                                 .orElseThrow(() -> new NotFoundException("Event with id=" + event + " not found")))
                         .collect(Collectors.toSet()));
             }
-            if(newCompilation.getPinned() != null) {
+            if (newCompilation.getPinned() != null) {
                 compilation.setPinned(newCompilation.getPinned());
             }
             if (!newCompilation.getTitle().isEmpty() || !newCompilation.getTitle().isBlank()) {
@@ -59,8 +59,8 @@ public class CompServiceImpl implements CompService {
         }
     }
 
-    public List<CompilationDto> getAllPublic(boolean pinned, int from, int size){
-        int page = from/size;
+    public List<CompilationDto> getAllPublic(boolean pinned, int from, int size) {
+        int page = from / size;
         Pageable pageable = PageRequest.of(page, size);
         Page<Compilation> categories;
         if (pinned) {
@@ -78,6 +78,6 @@ public class CompServiceImpl implements CompService {
 
     private Compilation findById(long compId) {
         return repository.findById(compId)
-                .orElseThrow(()-> new NotFoundException("Compilation with id="+compId+ " not found"));
+                .orElseThrow(() -> new NotFoundException("Compilation with id=" + compId + " not found"));
     }
 }

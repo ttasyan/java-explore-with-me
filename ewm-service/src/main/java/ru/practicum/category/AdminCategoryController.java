@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/admin/categories")
 public class AdminCategoryController {
-    private CategoryService service;
+    private final CategoryService service;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -24,7 +24,7 @@ public class AdminCategoryController {
     }
 
     @PatchMapping("/{catId}")
-    public CategoryDto modifyCategory(@PathVariable long catId,@RequestBody NewCategoryRequest request) {
+    public CategoryDto modifyCategory(@PathVariable long catId, @RequestBody NewCategoryRequest request) {
         return service.modifyCategory(catId, request);
     }
 }

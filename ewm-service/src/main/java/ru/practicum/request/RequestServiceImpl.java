@@ -2,7 +2,6 @@ package ru.practicum.request;
 
 import jakarta.validation.ConstraintViolationException;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.event.EventRepository;
 import ru.practicum.event.model.Event;
