@@ -26,10 +26,9 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     @Query("SELECT e FROM Event e WHERE e.eventDate BETWEEN :rangeStart AND :rangeEnd " +
             "AND (:text IS NULL OR e.description ILIKE %:text% OR e.annotation ILIKE %:text%)" +
-            " AND (:paid IS NULL OR e.paid = :paid) AND (:onlyAvailable IS NULL OR e.available = :onlyAvailable)" +
+            " AND (:paid IS NULL OR e.paid = :paid) " +
             "AND (:categories IS NULL OR e.category IN :categories)")
     Page<Event> findWithParamsPublic(@Param("text") String text, @Param("categories") List<Long> categories,
                                      @Param("paid") boolean paid, @Param("rangeStart") LocalDateTime rangeStart,
-                                     @Param("rangeEnd") LocalDateTime rangeEnd, @Param("onlyAvailable") boolean onlyAvailable,
-                                     Pageable pageable);
+                                     @Param("rangeEnd") LocalDateTime rangeEnd, Pageable pageable);
 }

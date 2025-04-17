@@ -30,7 +30,7 @@ services:
       interval: 5s
       retries: 10
     volumes:
-      - postgres:/var/lib/postgresql/data
+      - stats-db-data:/var/lib/postgresql/data/
     networks:
       - stat-net
 
@@ -49,7 +49,8 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/ewm-db
       - SPRING_DATASOURCE_USERNAME=sa
       - SPRING_DATASOURCE_PASSWORD=pass
-
+    networks:
+      - ewm-net
 
   ewm-db:
     image: postgres:16.1
@@ -66,9 +67,12 @@ services:
       interval: 5s
       retries: 10
     volumes:
-      - postgres:/var/lib/postgresql/data
-
+      - ewm-db-data:/var/lib/postgresql/data/
+    networks:
+      - ewm-net
 volumes:
-  postgres:
+  stats-db-data:
+  ewm-db-data:
 networks:
   stat-net:
+  ewm-net:

@@ -190,8 +190,20 @@ public class EventServiceImpl implements EventService {
                                             LocalDateTime rangeEnd, boolean onlyAvailable, String sort, int from, int size) {
         int page = from / size;
         Pageable pageable = PageRequest.of(page, size);
-        Page<Event> events = repository.findWithParamsPublic(text, categories, paid, rangeStart, rangeEnd, onlyAvailable,pageable);
-        return events.stream().map(event -> mapper.eventToEventShortDto(event)).toList();
+        Page<Event> events = repository.findWithParamsPublic(text, categories, paid, rangeStart, rangeEnd,pageable);
+
+        if (onlyAvailable) {
+            return events.stream()
+                    .filter(event -> event.getState().equals(EventStatus.PUBLISHED))
+                    .filter(event -> event.getConfirmedRequests() != event.getParticipationLimit())
+                    .map(event -> mapper.eventToEventShortDto(event)).toList();
+        }
+        else {
+            return events.stream()
+                    .filter(event -> event.getState().equals(EventStatus.PUBLISHED))
+                    .filter(event -> event.getConfirmedRequests() == event.getParticipationLimit())
+                    .map(event -> mapper.eventToEventShortDto(event)).toList();
+        }
     }
 
     public EventFullDto getByIdPublic(long id) {
