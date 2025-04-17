@@ -10,6 +10,7 @@ import ru.practicum.exception.IntegrityConstraintViolationException;
 import ru.practicum.exception.NotFoundException;
 
 import java.util.List;
+
 @Service
 @AllArgsConstructor
 public class UserServiceImpl implements UserService {

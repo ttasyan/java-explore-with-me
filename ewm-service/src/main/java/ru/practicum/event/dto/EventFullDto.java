@@ -11,6 +11,7 @@ import ru.practicum.event.model.EventStatus;
 import ru.practicum.user.UserShortDto;
 
 import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
