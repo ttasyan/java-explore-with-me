@@ -10,7 +10,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class UpdateCompilationRequest {
     private Set<Long> events;
-    private boolean pinned;
+    private Boolean pinned;
     @Size(min = 1, max = 50)
     private String title;
 }

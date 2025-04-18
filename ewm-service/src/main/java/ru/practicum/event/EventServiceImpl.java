@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import ru.practicum.category.CategoryRepository;
 import ru.practicum.event.dto.*;
 import ru.practicum.event.model.Event;
 import ru.practicum.event.model.EventStateAction;
@@ -30,12 +31,16 @@ public class EventServiceImpl implements EventService {
     private UserRepository userRepository;
     private RequestRepository requestRepository;
     private RequestMapper requestMapper;
+    private CategoryRepository categoryRepository;
 
     public List<EventFullDto> getAllAdmin(List<Long> users, List<String> states, List<Long> categories, LocalDateTime rangeStart,
                                           LocalDateTime rangeEnd, int from, int size) {
         int page = from / size;
         Pageable pageable = PageRequest.of(page, size);
         Page<Event> events = repository.findWithParams(users, states, categories, rangeStart, rangeEnd, pageable);
+        if (users == null && states == null && categories == null && rangeStart == null && rangeEnd == null) {
+            return repository.findAll(pageable).stream().map(event -> mapper.eventToEventFullDto(event)).toList();
+        }
         return events.stream().map(event -> mapper.eventToEventFullDto(event)).toList();
     }
 
@@ -78,6 +83,7 @@ public class EventServiceImpl implements EventService {
         int page = from / size;
         Pageable pageable = PageRequest.of(page, size);
         Page<Event> events = repository.findAll(pageable);
+
         return events.stream().map(event -> mapper.eventToEventFullDto(event)).toList();
     }
 
@@ -96,10 +102,12 @@ public class EventServiceImpl implements EventService {
                     .state(EventStatus.PENDING)
                     .confirmedRequests(0)
                     .participationLimit(newEvent.getParticipationLimit())
-                    .requestModeration(newEvent.isRequestModeration())
-                    .paid(newEvent.isPaid())
+                    .requestModeration(newEvent.getRequestModeration())
+                    .paid(newEvent.getPaid())
                     .location(locationRepository.findByLatAndLon(newEvent.getLocation().getLat(), newEvent.getLocation().getLon()))
                     .annotation(newEvent.getAnnotation())
+                    .category(categoryRepository.findById(newEvent.getCategory())
+                            .orElseThrow(() -> new NotFoundException("Category not found")))
                     .build();
             return mapper.eventToEventFullDto(repository.save(event));
         } catch (ConstraintViolationException e) {
@@ -191,7 +199,9 @@ public class EventServiceImpl implements EventService {
         int page = from / size;
         Pageable pageable = PageRequest.of(page, size);
         Page<Event> events = repository.findWithParamsPublic(text, categories, paid, rangeStart, rangeEnd, pageable);
-
+        if (text == null && categories == null && rangeStart == null && rangeEnd == null) {
+            return repository.findAll(pageable).stream().map(event -> mapper.eventToEventShortDto(event)).toList();
+        }
         if (onlyAvailable) {
             return events.stream()
                     .filter(event -> event.getState().equals(EventStatus.PUBLISHED))

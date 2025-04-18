@@ -12,6 +12,6 @@ import java.util.Set;
 @AllArgsConstructor
 public class CompilationDto {
     private String title;
-    private boolean pinned;
+    private boolean pinned = false;
     private Set<Event> events;
 }

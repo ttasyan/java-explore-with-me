@@ -13,7 +13,7 @@ public class AdminCompController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CompilationDto addComp(@RequestBody @Valid NewCompilation newCompilation) {
+    public CompilationDto addComp(@RequestBody NewCompilation newCompilation) {
         return service.addComp(newCompilation);
     }
 
@@ -24,7 +24,7 @@ public class AdminCompController {
     }
 
     @PatchMapping("/{compId}")
-    public CompilationDto modifyComp(@PathVariable long compId, @RequestBody @Valid NewCompilation newCompilation) {
+    public CompilationDto modifyComp(@PathVariable long compId, @RequestBody @Valid UpdateCompilationRequest newCompilation) {
         return service.modifyComp(compId, newCompilation);
     }
 

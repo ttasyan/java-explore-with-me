@@ -38,7 +38,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public void delete(long userId) {
+    public void delete(Long userId) {
         if (repository.findById(userId).isEmpty()) {
             throw new NotFoundException("User with id=" + userId + " not found");
         }

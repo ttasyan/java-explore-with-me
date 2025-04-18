@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.event.EventRepository;
 import ru.practicum.exception.AlreadyExistsException;
 import ru.practicum.exception.NotFoundException;
+import ru.practicum.exception.ValidationException;
 
 import java.util.List;
 
@@ -41,6 +42,9 @@ public class CategoryServiceImpl implements CategoryService {
         try {
             Category category = findCategoryById(catId);
 
+            if (request.getName().length() > 50) {
+                throw new ValidationException("Name length can not be > 50");
+            }
             category.setName(request.getName());
             return mapper.categoryToCategoryDto(repository.save(category));
         } catch (ConstraintViolationException e) {
@@ -69,6 +73,6 @@ public class CategoryServiceImpl implements CategoryService {
         if (e.getMessage().contains("categories_name_key")) {
             return new AlreadyExistsException("Category with name " + categoryName + " already exists");
         }
-        return e;
+        return new ValidationException("Field name is not correct");
     }
 }

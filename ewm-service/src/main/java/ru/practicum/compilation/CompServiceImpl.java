@@ -23,7 +23,11 @@ public class CompServiceImpl implements CompService {
     public CompilationDto addComp(NewCompilation newCompilation) {
         try {
             Compilation compilation = new Compilation();
-            compilation.setPinned(newCompilation.getPinned());
+            if (newCompilation.getPinned() != null) {
+                compilation.setPinned(newCompilation.getPinned());
+            } else {
+                compilation.setPinned(false);
+            }
             compilation.setTitle(newCompilation.getTitle());
             compilation.setEvents(newCompilation.getEvents().stream().map(event -> eventRepository.findById(event)
                             .orElseThrow(() -> new NotFoundException("Event with id=" + event + " not found")))
@@ -39,7 +43,7 @@ public class CompServiceImpl implements CompService {
         repository.deleteById(compId);
     }
 
-    public CompilationDto modifyComp(long compId, NewCompilation newCompilation) {
+    public CompilationDto modifyComp(long compId, UpdateCompilationRequest newCompilation) {
         try {
             Compilation compilation = findById(compId);
             if (!newCompilation.getEvents().isEmpty()) {

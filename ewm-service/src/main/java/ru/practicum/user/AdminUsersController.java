@@ -13,9 +13,9 @@ public class AdminUsersController {
     private final UserService service;
 
     @GetMapping
-    public List<UserDto> getAll(@RequestParam(name = "ids") List<Long> ids,
-                                @RequestParam(name = "from", defaultValue = "0") int from,
-                                @RequestParam(name = "size", defaultValue = "10") int size) {
+    public List<UserDto> getAll(@RequestParam(required = false, name = "ids") List<Long> ids,
+                                @RequestParam(name = "from", required = false, defaultValue = "0") int from,
+                                @RequestParam(name = "size", required = false, defaultValue = "10") int size) {
         return service.getAll(ids, from, size);
     }
 
@@ -27,7 +27,7 @@ public class AdminUsersController {
 
     @DeleteMapping("/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable long userId) {
+    public void delete(@PathVariable Long userId) {
         service.delete(userId);
     }
 }

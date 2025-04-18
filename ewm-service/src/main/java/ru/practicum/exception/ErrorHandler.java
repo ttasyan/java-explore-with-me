@@ -84,26 +84,26 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler(IntegrityConstraintViolationException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleIntegrityConstraintViolationException(IntegrityConstraintViolationException e) {
         String reasonMessage = "Data integrity violation";
         return ErrorResponse.builder()
                 .errors(List.of(e.getMessage()))
                 .message(e.getMessage())
                 .reason(reasonMessage)
-                .status(HttpStatus.CONFLICT.toString())
+                .status(HttpStatus.BAD_REQUEST.toString())
                 .build();
     }
 
     @ExceptionHandler(PublicationException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handlePublicationException(PublicationException e) {
         String reasonMessage = "For the requested operation the conditions are not met";
         return ErrorResponse.builder()
                 .errors(List.of(e.getMessage()))
                 .message(e.getMessage())
                 .reason(reasonMessage)
-                .status(HttpStatus.CONFLICT.toString())
+                .status(HttpStatus.BAD_REQUEST.toString())
                 .build();
     }
 

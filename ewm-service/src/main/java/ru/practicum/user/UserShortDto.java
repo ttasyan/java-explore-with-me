@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class UserShortDto {
-    private long id;
+    private Long id;
     private String name;
 }

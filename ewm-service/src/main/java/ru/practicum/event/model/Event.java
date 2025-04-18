@@ -46,6 +46,7 @@ public class Event {
     @JoinColumn(name = "initiator_id")
     private User initiator;
 
+    @Column(length = 7000)
     private String description;
 
     @NotNull

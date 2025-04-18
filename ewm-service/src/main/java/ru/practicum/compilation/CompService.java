@@ -8,7 +8,7 @@ public interface CompService {
 
     void deleteComp(long compId);
 
-    CompilationDto modifyComp(long compId, NewCompilation newCompilation);
+    CompilationDto modifyComp(long compId, UpdateCompilationRequest newCompilation);
 
     List<CompilationDto> getAllPublic(boolean pinned, int from, int size);
 

@@ -18,11 +18,13 @@ public class AdminEventController {
     private final EventService service;
 
     @GetMapping
-    public List<EventFullDto> getAll(@RequestParam List<Long> users, @RequestParam List<String> states,
-                                     @RequestParam List<Long> categories,
-                                     @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
-                                     @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
-                                     @RequestParam(defaultValue = "0") int from, @RequestParam(defaultValue = "10") int size) {
+    public List<EventFullDto> getAll(@RequestParam(required = false) List<Long> users,
+                                     @RequestParam(required = false) List<String> states,
+                                     @RequestParam(required = false) List<Long> categories,
+                                     @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
+                                     @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
+                                     @RequestParam(required = false, defaultValue = "0") int from,
+                                     @RequestParam(required = false, defaultValue = "10") int size) {
         return service.getAllAdmin(users, states, categories, rangeStart, rangeEnd, from, size);
     }
 

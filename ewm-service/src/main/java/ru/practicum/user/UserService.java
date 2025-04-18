@@ -8,5 +8,5 @@ public interface UserService {
 
     UserDto addUser(NewUserRequest request);
 
-    void delete(long userId);
+    void delete(Long userId);
 }
