@@ -96,10 +96,10 @@ public class EventServiceImpl implements EventService {
             updatedEvent.setPaid(newEvent.getPaid());
         }
         if (newEvent.getEventDate() != null) {
-            if (LocalDateTime.now().plusHours(2).toString().equals(newEvent.getEventDate())) {
+            if (LocalDateTime.now().plusHours(2).isAfter(newEvent.getEventDate())) {
                 throw new ValidationException("Date can not be less than 2 hours before now");
             }
-            // updatedEvent.setEventDate(LocalDateTime.parse(newEvent.getEventDate()));
+             updatedEvent.setEventDate(newEvent.getEventDate());
         }
 
         if (newEvent.getLocation() != null) {

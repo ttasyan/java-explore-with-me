@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import ru.practicum.event.model.EventStateAction;
 
+import java.time.LocalDateTime;
+
 
 @Data
 @AllArgsConstructor
@@ -19,7 +21,7 @@ public class UpdateEventAdminRequest {
     private String description;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private String eventDate;
+    private LocalDateTime eventDate;
     private LocationDto location;
 
     private Boolean paid;
