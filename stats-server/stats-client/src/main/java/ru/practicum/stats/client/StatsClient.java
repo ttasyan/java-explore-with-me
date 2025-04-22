@@ -13,13 +13,8 @@ import java.util.List;
 
 @Component
 public class StatsClient {
-    private final RestClient restClient;
-    private static String STATS_SERVER_URI = "http://localhost:9090";
-
-    public StatsClient(String uri) {
-        restClient = RestClient.create(uri);
-        STATS_SERVER_URI = uri;
-    }
+    private final RestClient restClient = RestClient.create();
+    private static final String STATS_SERVER_URI = "http://localhost:9090";
 
 
     public List<StatsResponse> stats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
