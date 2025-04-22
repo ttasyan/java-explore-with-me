@@ -6,7 +6,7 @@ services:
     build: ./stats-server/server
     container_name: stats-server
     networks:
-      - stat-net
+      - app-net
     depends_on:
       stats-db:
         condition: service_healthy
@@ -32,7 +32,7 @@ services:
     volumes:
       - stats-db-data:/var/lib/postgresql/data/
     networks:
-      - stat-net
+      - app-net
 
   ewm-service:
     image: ewm-service-image
@@ -50,7 +50,7 @@ services:
       - SPRING_DATASOURCE_USERNAME=sa
       - SPRING_DATASOURCE_PASSWORD=pass
     networks:
-      - ewm-net
+      - app-net
 
   ewm-db:
     image: postgres:16.1
@@ -69,10 +69,9 @@ services:
     volumes:
       - ewm-db-data:/var/lib/postgresql/data/
     networks:
-      - ewm-net
+      - app-net
 volumes:
   stats-db-data:
   ewm-db-data:
 networks:
-  stat-net:
-  ewm-net:
+  app-net:
