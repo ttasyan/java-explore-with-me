@@ -10,6 +10,7 @@ import ru.practicum.event.EventRepository;
 import ru.practicum.exception.IntegrityConstraintViolationException;
 import ru.practicum.exception.NotFoundException;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,15 +24,19 @@ public class CompServiceImpl implements CompService {
     public CompilationDto addComp(NewCompilation newCompilation) {
         try {
             Compilation compilation = new Compilation();
-            if (newCompilation.getPinned() != null) {
-                compilation.setPinned(newCompilation.getPinned());
-            } else {
-                compilation.setPinned(false);
+            if (newCompilation.getEvents() == null || newCompilation.getEvents().isEmpty()) {
+                compilation.setEvents(new HashSet<>());
             }
+
+            compilation.setPinned(newCompilation.getPinned() != null ? newCompilation.getPinned() : false);
+
             compilation.setTitle(newCompilation.getTitle());
-            compilation.setEvents(newCompilation.getEvents().stream().map(event -> eventRepository.findById(event)
-                            .orElseThrow(() -> new NotFoundException("Event with id=" + event + " not found")))
-                    .collect(Collectors.toSet()));
+            if (newCompilation.getEvents() != null && !newCompilation.getEvents().isEmpty()) {
+
+                compilation.setEvents(newCompilation.getEvents().stream().map(event -> eventRepository.findById(event)
+                                .orElseThrow(() -> new NotFoundException("Event with id=" + event + " not found")))
+                        .collect(Collectors.toSet()));
+            }
             return mapper.complicationToComplicationDto(repository.save(compilation));
         } catch (ConstraintViolationException e) {
             throw new IntegrityConstraintViolationException("Нарушение ограничения");
@@ -46,7 +51,7 @@ public class CompServiceImpl implements CompService {
     public CompilationDto modifyComp(long compId, UpdateCompilationRequest newCompilation) {
         try {
             Compilation compilation = findById(compId);
-            if (!newCompilation.getEvents().isEmpty()) {
+            if (newCompilation.getEvents() != null) {
                 compilation.setEvents(newCompilation.getEvents().stream().map(event -> eventRepository.findById(event)
                                 .orElseThrow(() -> new NotFoundException("Event with id=" + event + " not found")))
                         .collect(Collectors.toSet()));
@@ -54,7 +59,7 @@ public class CompServiceImpl implements CompService {
             if (newCompilation.getPinned() != null) {
                 compilation.setPinned(newCompilation.getPinned());
             }
-            if (!newCompilation.getTitle().isEmpty() || !newCompilation.getTitle().isBlank()) {
+            if (newCompilation.getTitle() != null && !newCompilation.getTitle().isBlank()) {
                 compilation.setTitle(newCompilation.getTitle());
             }
             return mapper.complicationToComplicationDto(repository.save(compilation));

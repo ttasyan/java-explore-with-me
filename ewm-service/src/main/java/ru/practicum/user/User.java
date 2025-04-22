@@ -24,7 +24,7 @@ public class User {
     @Email
     @Column
     @NotNull
-    @Size(min=6, max = 254)
+    @Size(min = 6, max = 254)
     @NotBlank
     private String email;
     @Column

@@ -23,7 +23,7 @@ public class Compilation {
     @Column
     private String title;
     @Column
-    private boolean pinned;
+    private Boolean pinned;
     @JoinTable(name = "compilation_events", joinColumns = @JoinColumn(name = "compilation_id"),
     inverseJoinColumns = @JoinColumn(name = "event_id"))
     @ManyToMany(fetch = FetchType.LAZY)

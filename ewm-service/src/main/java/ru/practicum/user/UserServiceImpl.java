@@ -5,7 +5,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import ru.practicum.exception.DuplicatedDataException;
 import ru.practicum.exception.IntegrityConstraintViolationException;
 import ru.practicum.exception.NotFoundException;
 
@@ -19,7 +21,7 @@ public class UserServiceImpl implements UserService {
 
     public List<UserDto> getAll(List<Long> ids, int from, int size) {
         int page = from / size;
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
         Page<User> users;
         if (ids != null && !ids.isEmpty()) {
             users = repository.findUsersByIdIn(ids, pageable);
@@ -32,6 +34,7 @@ public class UserServiceImpl implements UserService {
 
     public UserDto addUser(NewUserRequest request) {
         try {
+            findByEmail(request.getEmail());
             return mapper.userToUserDto(repository.save(mapper.requestToUser(request)));
         } catch (ConstraintViolationException e) {
             throw new IntegrityConstraintViolationException("Нарушение ограничения");
@@ -43,5 +46,11 @@ public class UserServiceImpl implements UserService {
             throw new NotFoundException("User with id=" + userId + " not found");
         }
         repository.deleteById(userId);
+    }
+
+    private void findByEmail(String email) {
+        if (repository.existsByEmail(email)) {
+            throw new DuplicatedDataException("Email already in use");
+        }
     }
 }

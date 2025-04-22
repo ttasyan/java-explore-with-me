@@ -1,7 +1,9 @@
 package ru.practicum.event.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.category.Category;
@@ -19,25 +21,25 @@ import java.time.LocalDateTime;
 public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
     private Category category;
 
     @NotNull
+    @NotBlank
     private String title;
 
     @NotNull
+    @NotBlank
     private String annotation;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "location_id")
+    @Embedded
     private Location location;
 
-    @NotNull
     @Column(name = "event_date")
     private LocalDateTime eventDate;
 
@@ -47,10 +49,12 @@ public class Event {
     private User initiator;
 
     @Column(length = 7000)
+    @NotBlank
     private String description;
 
     @NotNull
-    private boolean paid;
+    private Boolean paid;
+
 
     @Enumerated(EnumType.STRING)
     private EventStatus state;
@@ -66,7 +70,8 @@ public class Event {
 
     private int confirmedRequests;
 
-    private int participationLimit;
+    @PositiveOrZero
+    private int participantLimit;
 
     private long views;
 

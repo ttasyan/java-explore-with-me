@@ -8,6 +8,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.stats.dto.HitRequest;
 import ru.practicum.stats.dto.StatsResponse;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -16,7 +17,7 @@ public class StatsClient {
     private static final String STATS_SERVER_URI = "http://localhost:9090";
 
 
-    public ResponseEntity<List<StatsResponse>> stats(String start, String end, List<String> uris, boolean unique) {
+    public List<StatsResponse> stats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
 
         String currentUri = UriComponentsBuilder.fromHttpUrl(STATS_SERVER_URI)
                 .path("/stats")

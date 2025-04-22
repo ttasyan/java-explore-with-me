@@ -13,7 +13,7 @@ public class AdminCompController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CompilationDto addComp(@RequestBody NewCompilation newCompilation) {
+    public CompilationDto addComp(@RequestBody @Valid NewCompilation newCompilation) {
         return service.addComp(newCompilation);
     }
 

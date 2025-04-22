@@ -31,7 +31,7 @@ public class ErrorHandler {
                 .errors(List.of(e.getMessage()))
                 .message(e.getMessage())
                 .reason(reasonMessage)
-                .status(HttpStatus.NOT_FOUND.toString())
+                .status(HttpStatus.BAD_REQUEST.toString())
                 .build();
     }
 
@@ -96,14 +96,14 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler(PublicationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handlePublicationException(PublicationException e) {
         String reasonMessage = "For the requested operation the conditions are not met";
         return ErrorResponse.builder()
                 .errors(List.of(e.getMessage()))
                 .message(e.getMessage())
                 .reason(reasonMessage)
-                .status(HttpStatus.BAD_REQUEST.toString())
+                .status(HttpStatus.CONFLICT.toString())
                 .build();
     }
 
@@ -130,4 +130,17 @@ public class ErrorHandler {
                 .status(HttpStatus.CONFLICT.toString())
                 .build();
     }
+
+    @ExceptionHandler(CategoryHasEventsException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleCategoryHasEventsException(CategoryHasEventsException e) {
+        String reasonMessage = "Category has events";
+        return ErrorResponse.builder()
+                .errors(List.of(e.getMessage()))
+                .message(e.getMessage())
+                .reason(reasonMessage)
+                .status(HttpStatus.CONFLICT.toString())
+                .build();
+    }
+
 }

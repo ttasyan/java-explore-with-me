@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class EventFullDto {
-    private long id;
+    private Long id;
 
     private CategoryDto category;
     private String title;
@@ -40,5 +40,5 @@ public class EventFullDto {
     private LocalDateTime createdOn;
 
     private int confirmedRequests;
-    private int participationLimit;
+    private int participantLimit;
 }

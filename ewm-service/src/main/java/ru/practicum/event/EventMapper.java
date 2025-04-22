@@ -1,11 +1,9 @@
 package ru.practicum.event;
 
-import org.mapstruct.BeanMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.NullValuePropertyMappingStrategy;
-import ru.practicum.event.dto.EventFullDto;
-import ru.practicum.event.dto.EventShortDto;
+import org.mapstruct.*;
+import ru.practicum.category.Category;
+import ru.practicum.category.CategoryDto;
+import ru.practicum.event.dto.*;
 import ru.practicum.event.model.Event;
 
 @Mapper
@@ -13,12 +11,33 @@ public interface EventMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdOn", expression = "java(java.time.LocalDateTime.now())")
     @Mapping(target = "state", expression = "java(ru.practicum.event.model.EventStatus.PENDING)")
-    @Mapping(target = "participationLimit", source = "participationLimit", defaultValue = "0")
+    @Mapping(target = "participantLimit", source = "participantLimit", defaultValue = "0")
+    @Mapping(target = "paid", source = "paid", defaultValue = "false")
+    @Mapping(target = "requestModeration", source = "requestModeration", defaultValue = "true")
+    @Mapping(target = "category", source = "category")
+    Event newEventToEvent(NewEventDto newEventDto);
+
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     EventFullDto eventToEventFullDto(Event event);
 
-    @Mapping(target = "id", ignore = true)
-    //@Mapping(target = "category.id", source = "category")
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     EventShortDto eventToEventShortDto(Event event);
+
+    @Mapping(target = "category", source = "categoryId")
+    default Category map(Long categoryId) {
+        if (categoryId == null) {
+            return null;
+        }
+        Category category = new Category();
+        category.setId(categoryId);
+        return category;
+    }
+
+    default CategoryDto map(Category c) {
+        if (c == null) return null;
+        CategoryDto dto = new CategoryDto();
+        dto.setId(c.getId());
+        dto.setName(c.getName());
+        return dto;
+    }
 }
