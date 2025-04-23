@@ -28,8 +28,6 @@ services:
       timeout: 5s
       interval: 5s
       retries: 10
-    volumes:
-      - stats-db-data:/var/lib/postgresql/data/
 
 
   ewm-service:
@@ -40,7 +38,6 @@ services:
       context: ./ewm-service
       dockerfile: Dockerfile
     depends_on:
-      - stats-server
       - ewm-db
     environment:
       - STATS_SERVER_URL=http://stats-server:9090
@@ -63,9 +60,3 @@ services:
       timeout: 5s
       interval: 5s
       retries: 10
-    volumes:
-      - ewm-db-data:/var/lib/postgresql/data/
-
-volumes:
-  stats-db-data:
-  ewm-db-data:

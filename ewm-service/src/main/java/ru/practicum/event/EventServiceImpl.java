@@ -27,6 +27,7 @@ import ru.practicum.user.UserRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -98,7 +99,12 @@ public class EventServiceImpl implements EventService {
             updatedEvent.setPaid(newEvent.getPaid());
         }
         if (newEvent.getEventDate() != null) {
-            LocalDateTime updatedEventDate = LocalDateTime.parse(newEvent.getEventDate(), FORMATTER);
+            LocalDateTime updatedEventDate = LocalDateTime.now().minusHours(1);
+            try {
+                updatedEventDate = LocalDateTime.parse(newEvent.getEventDate(), FORMATTER);
+            } catch (DateTimeParseException ignored) {
+            }
+
             if (LocalDateTime.now().plusHours(2).isAfter(updatedEventDate)) {
                 throw new ValidationException("Date can not be less than 2 hours before now");
             }
@@ -174,8 +180,12 @@ public class EventServiceImpl implements EventService {
                 throw new EventAlreadyPublished("Can not change published event");
             }
 
-            if (newEvent.getEventDate() != null && LocalDateTime.now().plusHours(2).isAfter(newEvent.getEventDate())) {
-                throw new ValidationException("Date can not be less than 2 hours before now");
+            try {
+                if (newEvent.getEventDate() != null && LocalDateTime.now().plusHours(2).isAfter(LocalDateTime
+                        .parse(newEvent.getEventDate(), FORMATTER))) {
+                    throw new ValidationException("Date can not be less than 2 hours before now");
+                }
+            } catch (DateTimeParseException ignored) {
             }
 
             EventStateAction newStateAction = newEvent.getStateAction();
@@ -301,7 +311,8 @@ public class EventServiceImpl implements EventService {
         saveView("/events", httpServletRequest.getRemoteAddr());
         repository.saveAll(events);
 
-        return events.stream().map(event -> mapper.eventToEventShortDto(event)).toList();
+        return events.stream().map(event -> mapper.eventToEventShortDto(event))
+                .toList();
     }
 
     public EventFullDto getByIdPublic(long id, HttpServletRequest httpServletRequest) {

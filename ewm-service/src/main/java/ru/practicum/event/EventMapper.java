@@ -21,6 +21,7 @@ public interface EventMapper {
     EventFullDto eventToEventFullDto(Event event);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "eventDate", source = "eventDate", dateFormat = "yyyy-MM-dd HH:mm:ss")
     EventShortDto eventToEventShortDto(Event event);
 
     @Mapping(target = "category", source = "categoryId")

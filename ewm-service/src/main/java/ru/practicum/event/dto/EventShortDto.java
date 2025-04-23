@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import ru.practicum.category.CategoryDto;
 import ru.practicum.user.UserShortDto;
 
-import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -20,7 +19,7 @@ public class EventShortDto {
     private String annotation;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime eventDate;
+    private String eventDate;
     private UserShortDto initiator;
     private boolean paid;
     private int confirmedRequests;
