@@ -26,6 +26,7 @@ import ru.practicum.user.User;
 import ru.practicum.user.UserRepository;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +44,7 @@ public class EventServiceImpl implements EventService {
     private RequestMapper requestMapper;
     private CategoryRepository categoryRepository;
     private StatsClient statsClient;
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public List<EventFullDto> getAllAdmin(List<Long> users, List<String> states, List<Long> categories, LocalDateTime rangeStart,
                                           LocalDateTime rangeEnd, int from, int size) {
@@ -96,10 +98,11 @@ public class EventServiceImpl implements EventService {
             updatedEvent.setPaid(newEvent.getPaid());
         }
         if (newEvent.getEventDate() != null) {
-            if (LocalDateTime.now().plusHours(2).isAfter(newEvent.getEventDate())) {
+            LocalDateTime updatedEventDate = LocalDateTime.parse(newEvent.getEventDate(), FORMATTER);
+            if (LocalDateTime.now().plusHours(2).isAfter(updatedEventDate)) {
                 throw new ValidationException("Date can not be less than 2 hours before now");
             }
-             updatedEvent.setEventDate(newEvent.getEventDate());
+            updatedEvent.setEventDate(updatedEventDate);
         }
 
         if (newEvent.getLocation() != null) {

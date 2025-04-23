@@ -5,8 +5,7 @@ services:
       - "9090:9090"
     build: ./stats-server/server
     container_name: stats-server
-    networks:
-      - app-net
+
     depends_on:
       stats-db:
         condition: service_healthy
@@ -31,8 +30,7 @@ services:
       retries: 10
     volumes:
       - stats-db-data:/var/lib/postgresql/data/
-    networks:
-      - app-net
+
 
   ewm-service:
     image: ewm-service-image
@@ -49,8 +47,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/ewm-db
       - SPRING_DATASOURCE_USERNAME=sa
       - SPRING_DATASOURCE_PASSWORD=pass
-    networks:
-      - app-net
+
 
   ewm-db:
     image: postgres:16.1
@@ -68,10 +65,7 @@ services:
       retries: 10
     volumes:
       - ewm-db-data:/var/lib/postgresql/data/
-    networks:
-      - app-net
+
 volumes:
   stats-db-data:
   ewm-db-data:
-networks:
-  app-net:
