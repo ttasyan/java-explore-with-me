@@ -307,12 +307,8 @@ public class EventServiceImpl implements EventService {
                 .and(EventSpecification.onlyPublished());
         Page<Event> events = repository.findAll(specification, pageable);
         String ip = httpServletRequest.getRemoteAddr();
-        events.forEach(eventPage -> {
-            Event event = repository.findById(eventPage.getId())
-                    .orElseThrow(() -> new NotFoundException("Event with id=" + eventPage.getId() + " not found"));
-            saveView("/events", ip, event);
-            eventPage.setViews(event.getViews());
-        });
+        events.forEach(event -> saveViewToEvent(ip, event));
+        saveView("/events", ip);
 
         return events.stream().map(event -> mapper.eventToEventShortDto(event))
                 .toList();
@@ -321,7 +317,8 @@ public class EventServiceImpl implements EventService {
     public EventFullDto getByIdPublic(long id, HttpServletRequest httpServletRequest) {
         Event event = repository.findByIdAndState(id, EventStatus.PUBLISHED)
                 .orElseThrow(() -> new NotFoundException("Published event with id=" + id + " not found"));
-        saveView("/events/" + id, httpServletRequest.getRemoteAddr(), event);
+        saveView("/events/" + id, httpServletRequest.getRemoteAddr());
+        saveViewToEvent(httpServletRequest.getRemoteAddr(), event);
         List<StatsResponse> getResponses = loadStatsFromClient(
                 event.getPublishedOn(),
                 LocalDateTime.now(),
@@ -363,13 +360,7 @@ public class EventServiceImpl implements EventService {
         return statsClient.stats(start, end, uris, unique);
     }
 
-    private void saveView(String uri, String ip, Event event) {
-        HitRequest hitRequest = new HitRequest();
-        hitRequest.setApp("ewm-service");
-        hitRequest.setIp(ip);
-        hitRequest.setUri(uri);
-        hitRequest.setTimestamp(LocalDateTime.now());
-        statsClient.hit(hitRequest);
+    private void saveViewToEvent(String ip, Event event) {
         Set<String> ipsForEvent = uniqueIdsForEvents.computeIfAbsent(event.getId(), k -> new HashSet<>());
 
         if (!ipsForEvent.contains(ip)) {
@@ -377,5 +368,14 @@ public class EventServiceImpl implements EventService {
             ipsForEvent.add(ip);
             repository.save(event);
         }
+    }
+
+    private void saveView(String uri, String ip) {
+        HitRequest hitRequest = new HitRequest();
+        hitRequest.setApp("ewm-service");
+        hitRequest.setIp(ip);
+        hitRequest.setUri(uri);
+        hitRequest.setTimestamp(LocalDateTime.now());
+        statsClient.hit(hitRequest);
     }
 }

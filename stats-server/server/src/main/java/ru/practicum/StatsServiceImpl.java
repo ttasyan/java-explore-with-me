@@ -19,6 +19,9 @@ public class StatsServiceImpl implements StatsService {
     public List<StatsResponse> stats(LocalDateTime start, LocalDateTime end,
                                      List<String> uris, boolean unique) {
         List<StatsResponse> statsResponseList;
+        if (start.isAfter(end) || start.isAfter(LocalDateTime.now())) {
+            throw new ValidationException("Start can not be after end");
+        }
         if (unique) {
             statsResponseList = repository.countUniqueHits(start, end, uris);
         } else {
