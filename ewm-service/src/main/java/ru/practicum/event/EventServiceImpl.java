@@ -28,9 +28,7 @@ import ru.practicum.user.UserRepository;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
 @Service
@@ -46,6 +44,7 @@ public class EventServiceImpl implements EventService {
     private CategoryRepository categoryRepository;
     private StatsClient statsClient;
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private final Map<Long, Set<String>> uniqueIdsForEvents = new HashMap<>();
 
     public List<EventFullDto> getAllAdmin(List<Long> users, List<String> states, List<Long> categories, LocalDateTime rangeStart,
                                           LocalDateTime rangeEnd, int from, int size) {
@@ -99,16 +98,15 @@ public class EventServiceImpl implements EventService {
             updatedEvent.setPaid(newEvent.getPaid());
         }
         if (newEvent.getEventDate() != null) {
-            LocalDateTime updatedEventDate = LocalDateTime.now().minusHours(1);
             try {
-                updatedEventDate = LocalDateTime.parse(newEvent.getEventDate(), FORMATTER);
+                if (LocalDateTime.now().plusHours(2).isAfter(LocalDateTime
+                        .parse(newEvent.getEventDate(), FORMATTER))) {
+                    throw new ValidationException("Date can not be less than 2 hours before now");
+                }
+                updatedEvent.setEventDate(LocalDateTime
+                        .parse(newEvent.getEventDate(), FORMATTER));
             } catch (DateTimeParseException ignored) {
             }
-
-            if (LocalDateTime.now().plusHours(2).isAfter(updatedEventDate)) {
-                throw new ValidationException("Date can not be less than 2 hours before now");
-            }
-            updatedEvent.setEventDate(updatedEventDate);
         }
 
         if (newEvent.getLocation() != null) {
@@ -308,8 +306,13 @@ public class EventServiceImpl implements EventService {
                 .and(EventSpecification.sortBySortType(sort))
                 .and(EventSpecification.onlyPublished());
         Page<Event> events = repository.findAll(specification, pageable);
-        saveView("/events", httpServletRequest.getRemoteAddr());
-        repository.saveAll(events);
+        String ip = httpServletRequest.getRemoteAddr();
+        events.forEach(eventPage -> {
+            Event event = repository.findById(eventPage.getId())
+                    .orElseThrow(() -> new NotFoundException("Event with id=" + eventPage.getId() + " not found"));
+            saveView("/events", ip, event);
+            eventPage.setViews(event.getViews());
+        });
 
         return events.stream().map(event -> mapper.eventToEventShortDto(event))
                 .toList();
@@ -318,7 +321,7 @@ public class EventServiceImpl implements EventService {
     public EventFullDto getByIdPublic(long id, HttpServletRequest httpServletRequest) {
         Event event = repository.findByIdAndState(id, EventStatus.PUBLISHED)
                 .orElseThrow(() -> new NotFoundException("Published event with id=" + id + " not found"));
-        saveView("/events/" + id, httpServletRequest.getRemoteAddr());
+        saveView("/events/" + id, httpServletRequest.getRemoteAddr(), event);
         List<StatsResponse> getResponses = loadStatsFromClient(
                 event.getPublishedOn(),
                 LocalDateTime.now(),
@@ -360,12 +363,19 @@ public class EventServiceImpl implements EventService {
         return statsClient.stats(start, end, uris, unique);
     }
 
-    private void saveView(String uri, String ip) {
+    private void saveView(String uri, String ip, Event event) {
         HitRequest hitRequest = new HitRequest();
         hitRequest.setApp("ewm-service");
         hitRequest.setIp(ip);
         hitRequest.setUri(uri);
         hitRequest.setTimestamp(LocalDateTime.now());
         statsClient.hit(hitRequest);
+        Set<String> ipsForEvent = uniqueIdsForEvents.computeIfAbsent(event.getId(), k -> new HashSet<>());
+
+        if (!ipsForEvent.contains(ip)) {
+            event.setViews(event.getViews() + 1);
+            ipsForEvent.add(ip);
+            repository.save(event);
+        }
     }
 }
