@@ -9,6 +9,6 @@ import ru.practicum.stats.client.StatsClient;
 public class AppConfig {
     @Bean
     public StatsClient getStatsClient(@Value("${stats-server.url:http://localhost:9090}") String address) {
-        return new StatsClient();
+        return new StatsClient(address);
     }
 }

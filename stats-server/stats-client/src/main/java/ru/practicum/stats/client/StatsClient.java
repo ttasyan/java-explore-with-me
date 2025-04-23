@@ -1,4 +1,5 @@
 package ru.practicum.stats.client;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 
@@ -13,13 +14,19 @@ import java.util.List;
 
 @Component
 public class StatsClient {
-    private final RestClient restClient = RestClient.create();
-    private static final String STATS_SERVER_URI = "http://localhost:9090";
+    private final RestClient restClient;
+    private final String baseUrl;
+
+    public StatsClient(@Value("${stats-server.url}") String baseUrl) {
+        this.baseUrl = baseUrl;
+        this.restClient = RestClient.builder()
+                .baseUrl(baseUrl).build();
+    }
 
 
     public List<StatsResponse> stats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
 
-        String currentUri = UriComponentsBuilder.fromHttpUrl(STATS_SERVER_URI)
+        String currentUri = UriComponentsBuilder.fromHttpUrl(baseUrl)
                 .path("/stats")
                 .queryParam("start", start)
                 .queryParam("end", end)
@@ -42,7 +49,7 @@ public class StatsClient {
 
 
     public void hit(HitRequest hitRequest) {
-        String currentUri = UriComponentsBuilder.fromHttpUrl(STATS_SERVER_URI).path("/hit").toUriString();
+        String currentUri = UriComponentsBuilder.fromHttpUrl(baseUrl).path("/hit").toUriString();
 
         restClient.post()
                 .uri(currentUri)
