@@ -11,6 +11,8 @@ import ru.practicum.event.model.EventStatus;
 import ru.practicum.user.UserShortDto;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -41,4 +43,6 @@ public class EventFullDto {
 
     private int confirmedRequests;
     private int participantLimit;
+
+    private List<CommentDto> comments = new ArrayList<>();
 }
