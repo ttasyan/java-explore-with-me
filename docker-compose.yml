@@ -5,15 +5,14 @@ services:
       - "9090:9090"
     build: ./stats-server/server
     container_name: stats-server
-    networks:
-      - stat-net
+
     depends_on:
       stats-db:
         condition: service_healthy
     environment:
-        - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/stats-db
-        - SPRING_DATASOURCE_USERNAME=sa
-        - SPRING_DATASOURCE_PASSWORD=pass
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/stats-db
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=pass
 
   stats-db:
     image: postgres:16.1
@@ -21,18 +20,15 @@ services:
     ports:
       - "6542:5432"
     environment:
-        - POSTGRES_DB=stats-db
-        - POSTGRES_USER=sa
-        - POSTGRES_PASSWORD=pass
+      - POSTGRES_DB=stats-db
+      - POSTGRES_USER=sa
+      - POSTGRES_PASSWORD=pass
     healthcheck:
       test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
       timeout: 5s
       interval: 5s
       retries: 10
-    volumes:
-      - postgres:/var/lib/postgresql/data
-    networks:
-      - stat-net
+
 
   ewm-service:
     image: ewm-service-image
@@ -42,12 +38,13 @@ services:
       context: ./ewm-service
       dockerfile: Dockerfile
     depends_on:
-        - ewm-db
+      - ewm-db
+      - stats-server
     environment:
-          - CLIENT_URL=http://stats-server:9090
-          - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/ewm-db
-          - SPRING_DATASOURCE_USERNAME=sa
-          - SPRING_DATASOURCE_PASSWORD=pass
+      - STATS_SERVER_URL=http://stats-server:9090
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/ewm-db
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=pass
 
 
   ewm-db:
@@ -59,8 +56,8 @@ services:
       - POSTGRES_DB=ewm-db
       - POSTGRES_USER=sa
       - POSTGRES_PASSWORD=pass
-
-volumes:
-    postgres:
-networks:
-    stat-net:
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
