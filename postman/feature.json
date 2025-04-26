@@ -34,7 +34,10 @@
               "\r",
               "pm.test(\"Ответ должен содержать поле id\", function () {\r",
               "    pm.expect(target).to.have.property(\"id\")\r",
-              "});"
+              "});\r",
+              "\r",
+              "const userId = pm.response.json().id;\r",
+              "pm.environment.set(\"userId\", userId);"
             ],
             "type": "text/javascript",
             "packages": {}
@@ -105,7 +108,7 @@
               "                annotation: 'Интенсивная лекция для разработчиков уровня junior и выше.',\r",
               "                description: 'Подробный разбор многопоточности, коллекций и новых фич Java 21. Включает практику и ответы на вопросы участников.',\r",
               "                eventDate: '2025-06-15 18:30:00',\r",
-              "                category: categoryId,\r",
+              "                categoryId: categoryId,\r",
               "                location: { lat: 55.7558, lon: 37.6176 }\r",
               "            })\r",
               "        }\r",
@@ -189,7 +192,35 @@
           "listen": "prerequest",
           "script": {
             "exec": [
-              ""
+              "const main = async () => {\r",
+              "    const api = new API(pm);\r",
+              "    const rnd = new RandomUtils();\r",
+              "\r",
+              "    try {\r",
+              "        const user = await api.addUser(rnd.getUser());\r",
+              "        pm.collectionVariables.set(\"userId\", user.id);\r",
+              "\r",
+              "        const category = await api.addCategory(rnd.getCategory());\r",
+              "        let event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+              "        event = await api.publishEvent(event.id);\r",
+              "        pm.collectionVariables.set(\"eventId\", event.id);\r",
+              "        \r",
+              "        const author = await api.addUser(rnd.getUser());\r",
+              "        pm.collectionVariables.set(\"authorId\", author.id);\r",
+              "\r",
+              "        pm.request.body.update({\r",
+              "            mode: 'raw',\r",
+              "            raw: JSON.stringify(rnd.getComment()),\r",
+              "            options: { raw: { language: 'json' } }\r",
+              "        });\r",
+              "\r",
+              "    } catch(err) {\r",
+              "        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
+              "        throw err;\r",
+              "    }\r",
+              "};\r",
+              "\r",
+              "main();"
             ],
             "type": "text/javascript",
             "packages": {}
@@ -216,7 +247,7 @@
               "});\r",
               "\r",
               "const commentId = pm.response.json().id;\r",
-              "pm.environment.set(\"commentId\", commentId);"
+              "pm.collectionVariables.set(\"commentId\", commentId);"
             ],
             "type": "text/javascript",
             "packages": {}
