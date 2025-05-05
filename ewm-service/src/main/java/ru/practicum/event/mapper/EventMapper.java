@@ -1,4 +1,4 @@
-package ru.practicum.event;
+package ru.practicum.event.mapper;
 
 import org.mapstruct.*;
 import ru.practicum.category.Category;
@@ -18,6 +18,7 @@ public interface EventMapper {
     Event newEventToEvent(NewEventDto newEventDto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "comments", expression = "java(new java.util.ArrayList<>())")
     EventFullDto eventToEventFullDto(Event event);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

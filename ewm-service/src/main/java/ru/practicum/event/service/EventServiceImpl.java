@@ -1,4 +1,4 @@
-package ru.practicum.event;
+package ru.practicum.event.service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
@@ -12,6 +12,12 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.practicum.category.Category;
 import ru.practicum.category.CategoryRepository;
+import ru.practicum.event.CommentRepository;
+import ru.practicum.event.mapper.CommentMapper;
+import ru.practicum.event.mapper.EventMapper;
+import ru.practicum.event.EventRepository;
+import ru.practicum.event.EventSpecification;
+import ru.practicum.event.mapper.LocationMapper;
 import ru.practicum.event.dto.*;
 import ru.practicum.event.model.Event;
 import ru.practicum.event.model.EventStateAction;
@@ -37,11 +43,13 @@ import java.util.stream.Stream;
 public class EventServiceImpl implements EventService {
     private EventMapper mapper;
     private LocationMapper locationMapper;
+    private CommentMapper commentMapper;
     private EventRepository repository;
     private UserRepository userRepository;
     private RequestRepository requestRepository;
     private RequestMapper requestMapper;
     private CategoryRepository categoryRepository;
+    private CommentRepository commentRepository;
     private StatsClient statsClient;
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final Map<Long, Set<String>> uniqueIdsForEvents = new HashMap<>();
@@ -62,7 +70,11 @@ public class EventServiceImpl implements EventService {
         Page<Event> events = repository.findAll(specification, pageable);
 
         log.info("getAllAdmin method finished");
-        return events.stream().map(event -> mapper.eventToEventFullDto(event)).toList();
+        return events.stream().map(event -> {
+            EventFullDto eventFullDto = mapper.eventToEventFullDto(event);
+            eventFullDto.setComments(setCommentsToEvent(eventFullDto.getId()));
+            return eventFullDto;
+        }).toList();
     }
 
     public EventFullDto modifyEventAdmin(long eventId, UpdateEventAdminRequest newEvent) {
@@ -118,7 +130,9 @@ public class EventServiceImpl implements EventService {
         }
         log.info("modifyEventAdmin method finished, id={}", eventId);
 
-        return mapper.eventToEventFullDto(repository.save(updatedEvent));
+        EventFullDto eventFullDto = mapper.eventToEventFullDto(repository.save(updatedEvent));
+        eventFullDto.setComments(setCommentsToEvent(eventId));
+        return eventFullDto;
 
 
     }
@@ -142,7 +156,11 @@ public class EventServiceImpl implements EventService {
         Pageable pageable = PageRequest.of(page, size);
         Page<Event> events = repository.findAll(pageable);
 
-        return events.stream().map(event -> mapper.eventToEventFullDto(event)).toList();
+        return events.stream().map(event -> {
+            EventFullDto eventFullDto = mapper.eventToEventFullDto(event);
+            eventFullDto.setComments(setCommentsToEvent(eventFullDto.getId()));
+            return eventFullDto;
+        }).toList();
     }
 
     public EventFullDto addEvent(long userId, NewEventDto newEvent) {
@@ -158,7 +176,9 @@ public class EventServiceImpl implements EventService {
             event.setCategory(category);
             repository.save(event);
             log.info("addEvent method finished, id={}", event.getId());
-            return mapper.eventToEventFullDto(event);
+            EventFullDto eventFullDto = mapper.eventToEventFullDto(event);
+            eventFullDto.setComments(setCommentsToEvent(event.getId()));
+            return eventFullDto;
         } catch (DataIntegrityViolationException e) {
             throw new IntegrityConstraintViolationException("Нарушение ограничения");
         }
@@ -166,7 +186,9 @@ public class EventServiceImpl implements EventService {
 
     public EventFullDto getEventById(long userId, long eventId) {
         findByIdUser(userId);
-        return mapper.eventToEventFullDto(repository.findByIdAndInitiatorId(eventId, userId));
+        EventFullDto eventFullDto = mapper.eventToEventFullDto(repository.findByIdAndInitiatorId(eventId, userId));
+        eventFullDto.setComments(setCommentsToEvent(eventId));
+        return eventFullDto;
     }
 
     public EventFullDto modifyEventByUser(long userId, long eventId, UpdateEventUserRequest newEvent) {
@@ -209,7 +231,9 @@ public class EventServiceImpl implements EventService {
             }
             log.info("modifyEventByUser method finished, id={}", eventId);
 
-            return mapper.eventToEventFullDto(repository.save(updatedEvent));
+            EventFullDto eventFullDto = mapper.eventToEventFullDto(repository.save(updatedEvent));
+            eventFullDto.setComments(setCommentsToEvent(eventId));
+            return eventFullDto;
 
         } catch (DataIntegrityViolationException e) {
             throw new IntegrityConstraintViolationException("Нарушение ограничения");
@@ -328,7 +352,9 @@ public class EventServiceImpl implements EventService {
             StatsResponse statsResponse = getResponses.getFirst();
             event.setViews(statsResponse.getHits());
         }
-        return mapper.eventToEventFullDto(repository.save(event));
+        EventFullDto eventFullDto = mapper.eventToEventFullDto(repository.save(event));
+        eventFullDto.setComments(setCommentsToEvent(event.getId()));
+        return eventFullDto;
     }
 
     private Event findById(long eventId) {
@@ -377,5 +403,9 @@ public class EventServiceImpl implements EventService {
         hitRequest.setUri(uri);
         hitRequest.setTimestamp(LocalDateTime.now());
         statsClient.hit(hitRequest);
+    }
+
+    private List<CommentDto> setCommentsToEvent(long eventId) {
+        return commentRepository.findByEventId(eventId).stream().map(commentMapper::commentToCommentDto).toList();
     }
 }
